@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="module" src="/setup"></script>
+
+        <script>
+            function again() {
+                visualUpdate();
+            }
+            function setup(element) {
+                visualSetup(element, window);
+                setInterval(again, 20);
+            }
+        </script>
+        
+    </head>
+    <body onload="setup(document.getElementById('workspace'));">
+        <canvas name="workspace" id="workspace">
+
+        </canvas>
+    
+    </body>    
+</html>
