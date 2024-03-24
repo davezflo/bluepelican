@@ -1,4 +1,4 @@
-import {DistortionlessPerspectiveProjection, PerspectiveProjection} from "/projections";
+import {PerspectiveProjection} from "/projections";
 
 export var PSNONE = 0;
 export var PSFILL = 1;
@@ -10,7 +10,7 @@ export class VisualEngine
     constructor(ctx)
     {
         this.ctx = ctx;
-        this.visiblePoints = true;
+        this.visiblePoints = false;
         this.pointStroke = "#000000";
         this.pointFill = "#FFFF00";
         this.pointStyle = PSFILL;
@@ -28,7 +28,7 @@ export class VisualEngine
         this.saveAlpha = 1.0;     
         this.shapes = [];
         this.points = [];
-        this.projection = new DistortionlessPerspectiveProjection();
+        this.projection = new PerspectiveProjection();
     }
 
     saveStyles()
@@ -43,14 +43,6 @@ export class VisualEngine
         this.ctx.globalAlpha = this.saveAlpha;
         this.ctx.strokeStyle = this.saveStroke;
         this.ctx.fillStyle = this.saveFill;
-    }
-
-    setProjection(projectionType)
-    {
-        if(projectionType == "dp")
-            this.projection = new DistortionlessPerspectiveProjection();
-        else if(projectionType == "p")
-            this.projection = new PerspectiveProjection();
     }
 
     addShape(shape)
