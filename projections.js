@@ -6,6 +6,7 @@ export class PerspectiveProjection
     constructor(engine)
     {
         this.engine = engine;
+        this.defaultEyeZ = -4;
         this.adjustCenterX = .5;
         this.adjustCenterY = .5;
         this.orientationX = 0;
@@ -30,7 +31,7 @@ export class PerspectiveProjection
         this.orientX(0);
         this.orientY(0);
         this.orientZ(0);
-        this.camera = new Point(0, 0, -4);
+        this.camera = new Point(0, 0, this.defaultEyeZ);
         this.lerper = null;
     }
 
@@ -42,7 +43,7 @@ export class PerspectiveProjection
     reset()
     {
         this.lerper = null;
-        this.camera = new Point(0, 0, -4);
+        this.camera = new Point(0, 0, this.defaultEyeZ);
     }
 
     orientX(x)
@@ -88,7 +89,7 @@ export class PerspectiveProjection
             this.lerper = new Lerper(eye.vector, target.vector, time);
 	}
         else {
-            this.lerper.adjusttarget(delta, time);
+            this.lerper.adjustTarget(delta, time);
         }
     }
 

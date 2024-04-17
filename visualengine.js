@@ -110,17 +110,20 @@ export class VisualEngine
 
     draw()
     {
-        const drawLayers = 5;
         this.ctx.fillStyle = this.defaultClear;
         this.ctx.fillRect(0,0, this.width(), this.height());
         this.ctx.strokeRect(5,5,this.width()-5, this.height()-5);
         this.ctx.fillStyle = this.defaultFill;
-        var drawLevel = 0;
-        for(drawLevel=0;drawLevel<drawLayers;drawLevel++) {
-            var items = this.shapes.filter(x => x.drawLevel == drawLevel);
-            items.forEach(x => x.draw(this));
-        }
+
+        var faceArray = new Array();
+        this.shapes.forEach(x => x.prepare(this, faceArray));
+
+        let sortedEntries = faceArray.sort((a, b) => b[0]-a[0]);
         
+        sortedEntries.forEach((a) => {
+            a[1].shape.drawFace(this, a[1].faceIndex);
+        })
+
         if(this.visiblePoints) {
             this.drawPoints(this.points);
         }

@@ -14,20 +14,28 @@ export function visualSetup(canvas, window)
 
     engine = new VisualEngine(ctx);
     
-    cube = new Cube(.1, .1, .8);
-    engine.addShape(cube.asShape());
+    // cube = new Cube(.3, .3, .8);
+    // engine.addShape(cube.asShape());
 
-    cube2 = new Cube(.3, .3, .3);
+    cube2 = new Cube(.3, .3, .8);
     engine.addShape(cube2.asShape());
-    cube2.asShape().translateZ(20);
 
+}
+
+export function visualRefresh()
+{
+    engine.update();
+    engine.draw();
 }
 
 export function visualUpdate()
 {
-    cube2.asShape().translateZ(-spin*.1);
-    cube.asShape().rotateX(spin*Math.PI/180);
-    cube.asShape().rotateY(-5*spin*Math.PI/180);
+    cube2.asShape().rotateX(-1*spin*Math.PI/180);
+    cube2.asShape().rotateY(2*spin*Math.PI/180);
+
+    // cube.asShape().rotateX(spin*Math.PI/180);
+    // cube.asShape().rotateY(-1*spin*Math.PI/180);
+    engine.projection.eye().z+= .1;
     spin++;
     engine.update();
     engine.draw();
@@ -35,6 +43,7 @@ export function visualUpdate()
 
 window.visualSetup = visualSetup;
 window.visualUpdate = visualUpdate;
+window.visualRefresh = visualRefresh;
 
 
 

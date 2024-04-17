@@ -24,6 +24,13 @@ export class Point {
         return returnvalue;
     }
 
+    distance(otherPoint)
+    {
+        return Math.sqrt((this.vector.a1-otherPoint.vector.a1)*(this.vector.a1-otherPoint.vector.a1)+
+                        (this.vector.a2-otherPoint.vector.a2)*(this.vector.a2-otherPoint.vector.a2)+
+                        (this.vector.a3-otherPoint.vector.a3)*(this.vector.a3-otherPoint.vector.a3));
+    }
+
     cross(otherPoint)
     {
         var x = this.vector.a2*otherPoint.vector.a3-this.vector.a3*otherPoint.vector.a2;
@@ -52,7 +59,6 @@ export class Point {
     }
 }
 
-
 class Shape {
     constructor() { 
         this.verticies = [];
@@ -77,7 +83,6 @@ class Shape {
         0,0,1,0,
         0,0,0,1);
         this.translateMatrix = new Matrix4x4(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
-        this.drawLevel = 1;
     }
 
     setCenter(center)
@@ -162,52 +167,61 @@ class Shape {
         }
     }
 
-    draw(engine) {
-        var me = this;
-        var faceIndex = 0;
-        this.faces.forEach((face) => {
+    prepare(engine, returnArray) {
+        const returnSet = this.faces.map((face, faceIndex) => {
+            const center = this.faceCenters[faceIndex];
 
-            engine.ctx.beginPath();
-            var start = true;
-            face.forEach(async function(index) {
-                var x = me.verticies[index].X(engine);
-                var y = me.verticies[index].Y(engine);
-                if(start) {
-                    start = false;
-                    engine.ctx.moveTo(x, y);
-                }
-                else {
-                    engine.ctx.lineTo(x, y);
-                }
-            }, me, engine, start, faceIndex);
-            
-            engine.ctx.closePath();
-            
-            if(engine.paint) {
-                var center = me.faceCenters[faceIndex];
-                var eye = engine.projection.eye();
-                var viewVector = center.minus(eye);
-                var dot = viewVector.dot(me.faceNormal[faceIndex]);
-                if(Math.sign(dot) == -1) {
-                    engine.ctx.lineWidth = .8;
-                    engine.ctx.fillStyle = me.faceColors[faceIndex];
-                    engine.ctx.strokeStyle = me.faceColors[faceIndex];
-                    engine.ctx.fill();
-                    engine.ctx.stroke();
-                }
-            }   
+            var distance = center.distance(engine.projection.eye());
+  
+            const shape = this;
+            return { distance, faceIndex, shape };
+        });
 
-            if(engine.wireFrame) 
-            {
-                var save = engine.ctx.strokeStyle;
-                engine.ctx.lineWidth = 1;
-                engine.ctx.strokeStyle = engine.wireFrameColor;
-                engine.ctx.stroke();     
-                engine.ctx.strokeStyle = save;
+        returnSet.forEach((item) => {
+            returnArray.push([item.distance, { distance: item.distance, shape: item.shape, faceIndex: item.faceIndex }]);
+        });
+    }
+
+    drawFace(engine, faceIndex) {
+        var face = this.faces[faceIndex];
+        engine.ctx.beginPath();
+        var start = true;
+        face.forEach(async function(index) {
+            var x = this.verticies[index].X(engine);
+            var y = this.verticies[index].Y(engine);
+            if(start) {
+                start = false;
+                engine.ctx.moveTo(x, y);
             }
-            
-            faceIndex = faceIndex + 1;
-        }, me, engine);
+            else {
+                engine.ctx.lineTo(x, y);
+            }
+        }, this, engine, start, faceIndex);
+        
+        engine.ctx.closePath();
+        
+        if(engine.paint) {
+            var center = this.faceCenters[faceIndex];
+            var eye = engine.projection.eye();
+            var viewVector = center.minus(eye);
+            var dot = viewVector.dot(this.faceNormal[faceIndex]);
+            if(Math.sign(dot) == -1) {
+                engine.ctx.lineWidth = .8;
+                engine.ctx.fillStyle = this.faceColors[faceIndex];
+                engine.ctx.strokeStyle = this.faceColors[faceIndex];
+                engine.ctx.fill();
+                engine.ctx.stroke();
+            }
+        }   
+
+        if(engine.wireFrame) 
+        {
+            var save = engine.ctx.strokeStyle;
+            engine.ctx.lineWidth = 1;
+            engine.ctx.strokeStyle = engine.wireFrameColor;
+            engine.ctx.stroke();     
+            engine.ctx.strokeStyle = save;
+        }
     }
 }
 
